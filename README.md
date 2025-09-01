@@ -1,69 +1,67 @@
-# React + TypeScript + Vite
+#Projeto PagAI - https://pagai-9el.pages.dev
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+PagAÍ — Controle simples de devedores
 
-Currently, two official plugins are available:
+App web para gerenciamento de devedores: cadastre valores devidos, registre pagamentos (com data/hora e observação), acompanhe saldo restante, visualize métricas (total x mensal), histórico, calendário por ano/mês e arquivos (arquivados/quitados). Interface moderna, responsiva e leve.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+✨ Stack
 
-## Expanding the ESLint configuration
+React + Vite + TypeScript
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Tailwind CSS
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Firebase (Auth + Firestore)
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+Deploy Cloudflare Pages
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+✅ Funcionalidades
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Autenticação por e-mail/senha (Firebase Auth)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+CRUD de devedores (soft delete e arquivamento automático quando quitado)
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Registro de pagamentos (soft delete de pagamento)
+
+Home/Dashboard com progresso (pago x restante)
+
+Métricas: visão Total e Mensal (com alternância no UI)
+
+Calendário: Anos → Meses → Devedores do período
+
+Arquivados: devedores quitados (reabrir ou excluir)
+
+Exportar CSV (apenas itens visíveis)
+
+Responsivo (mobile/desktop), com toasts e UI/UX consistente
+
+Formatação monetária BR (1.234,56)
+
+📦 Estrutura (resumo) src/ components/ AuthGuard.tsx BackgroundFX.tsx Footer.tsx Navbar.tsx UserMenu.tsx lib/ firebase.ts money.ts # parseAmountBR / formatMoneyBR auth.ts pages/ Home.tsx Dashboard.tsx Debtor.tsx Metrics.tsx Profile.tsx Login.tsx Register.tsx Archived.tsx calendar/ CalendarYears.tsx CalendarMonths.tsx CalendarMonthDebtors.tsx types.ts main.tsx App.tsx index.html tailwind.config.js postcss.config.js
+
+🧭 Rotas principais
+
+/login / /register
+
+/ (Home/Dashboard)
+
+/debt/:id (página do devedor)
+
+/metrics (Total/Mensal, por devedor e geral)
+
+/calendar → /calendar/:year → /calendar/:year/:month
+
+/archived (quitados/arquivados)
+
+/profile
+
+💡 Convenções de UX
+
+Dinheiro: formatMoneyBR (lib money.ts)
+
+Entrada de valores: aceita 1.000,50 ou 1000.50 (lib parseAmountBR)
+
+Ordenação de pagamentos: mais recentes primeiro
+
+Exclusão: soft delete (pagamentos e devedor)
+
+Arquivamento automático quando o restante chegar a 0 (<= 0,01)
