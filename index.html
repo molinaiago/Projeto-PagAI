@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- TÍTULO -->
+    <title>PagAÍ</title>
+
+    <!-- ÍCONES -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#10b981" />
+    <!-- diga ao navegador que este site usa esquema CLARO sempre -->
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light"><!-- ajuda no iOS -->
+    <!-- cor da UI do navegador no mobile (barra de endereço, etc.) -->
+    <meta name="theme-color" content="#10b981">
+
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+ <!-- DEPLOY: npm run build
+              npx wrangler pages deploy dist --project-name=pagai
+
+ -->

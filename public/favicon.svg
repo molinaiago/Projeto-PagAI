@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" fill="url(#glow)"/>
+  <text x="50%" y="50%" font-size="40" text-anchor="middle" dy=".35em" font-family="Arial, sans-serif" font-weight="bold" fill="#064e3b">
+    P
+  </text>
+</svg>
