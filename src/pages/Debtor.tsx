@@ -1,3 +1,4 @@
+// src/pages/DebtorPage.tsx
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { auth, db } from '../lib/firebase';
@@ -12,7 +13,15 @@ import BackgroundFX from '../components/BackgroundFX';
 import { FirebaseError } from 'firebase/app';
 import { formatMoneyBR, parseAmountBR } from '../lib/money';
 
-/** Data/hora LOCAL no formato aceito por <input type="datetime-local"> */
+// Mapeamento para exibir nomes amigáveis na UI
+const paymentMethodLabels: Record<string, string> = {
+  pix: 'PIX',
+  credito: 'Cartão de Crédito',
+  debito: 'Cartão de Débito',
+  dinheiro: 'Dinheiro',
+  outros: 'Outros',
+};
+
 function localDatetimeNow(): string {
   const d = new Date();
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -24,7 +33,6 @@ function localDatetimeNow(): string {
   return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
 }
 
-/** Toast simples, responsivo */
 function Toast({
   show,
   msg,
@@ -67,12 +75,15 @@ export default function DebtorPage() {
 
   const [debtor, setDebtor] = useState<Debtor | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [amount, setAmount] = useState(''); // string (aceita vírgula/ponto)
-  // ref guarda o "agora" inicial para sabermos se o usuário mexeu no campo
+
+  // States do Formulário
+  const [amount, setAmount] = useState('');
   const initialLocalNowRef = useRef(localDatetimeNow());
   const [date, setDate] = useState<string>(initialLocalNowRef.current);
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const [method, setMethod] = useState<Payment['paymentMethod']>('pix');
+  const [otherMethod, setOtherMethod] = useState('');
 
   // toasts
   const [toastMsg, setToastMsg] = useState('');
@@ -102,7 +113,6 @@ export default function DebtorPage() {
       setDebtor({ id: snap.id, ...data });
     });
 
-    // A consulta já vem em ordem desc, mas a ordenação final é local
     const pref = collection(db, 'debtors', id, 'payments');
     const qy = query(pref, orderBy('date', 'desc'));
     const unsub2 = onSnapshot(qy, (snap) => {
@@ -123,7 +133,6 @@ export default function DebtorPage() {
     return Math.max(0, (Number(debtor.total) || 0) - paid);
   }, [debtor, payments]);
 
-  // ====== Filtro/ordenação local ======
   const [sort, setSort] = useState<'desc' | 'asc'>('desc');
   const [q, setQ] = useState('');
 
@@ -149,17 +158,20 @@ export default function DebtorPage() {
 
   async function addPayment(e: React.FormEvent) {
     e.preventDefault();
-    if (!id) { showToast('Devedor não encontrado.', false); return; }
-    if (!auth.currentUser) { showToast('Sessão expirada. Faça login.', false); return; }
+    if (!id || !auth.currentUser) return;
 
     const amountNum = parseAmountBR(amount);
-    if (isNaN(amountNum)) { showToast('Valor inválido. Ex.: 100,50', false); return; }
-    if (amountNum < 0)   { showToast('O valor não pode ser negativo.', false); return; }
+    if (isNaN(amountNum) || amountNum < 0) {
+      showToast('Valor inválido.', false);
+      return;
+    }
+    if (method === 'outros' && !otherMethod.trim()) {
+      showToast('Especifique o método de pagamento.', false);
+      return;
+    }
 
     try {
       setSaving(true);
-
-      // Se o usuário não mexeu no campo desde a montagem, usamos o "agora" real
       let dateStr = date;
       if (date === initialLocalNowRef.current) {
         dateStr = localDatetimeNow();
@@ -172,25 +184,27 @@ export default function DebtorPage() {
       }
 
       const uid = auth.currentUser.uid;
-      await addDoc(collection(db, 'debtors', id, 'payments'), {
+      const payload: Omit<Payment, 'id'> = {
         debtorId: id,
         ownerUid: uid,
         amount: Number(amountNum.toFixed(2)),
         date: when.getTime(),
         note: note?.trim() || null,
         createdAt: Date.now(),
-      });
+        paymentMethod: method,
+        paymentMethodOther: method === 'outros' ? otherMethod.trim() : null,
+      };
 
-      // Limpa e reconfigura para o "agora" (novo "agora" de referência)
+      await addDoc(collection(db, 'debtors', id, 'payments'), payload as any);
+
       setAmount('');
       setNote('');
       const freshNow = localDatetimeNow();
       initialLocalNowRef.current = freshNow;
       setDate(freshNow);
-
-      // Garante que a ordenação esteja em "Mais recentes" após adicionar
+      setMethod('pix');
+      setOtherMethod('');
       setSort('desc');
-
       showToast('Pagamento adicionado!');
     } catch (err: any) {
       console.error('[addPayment] error =>', err);
@@ -236,7 +250,6 @@ export default function DebtorPage() {
     }
   }
 
-  /** SOFT DELETE do DEVEDOR (toast + redirect) */
   async function softDeleteDebtor() {
     if (!id || !debtor) return;
     const ok = confirm('Tem certeza que deseja excluir (arquivar) este devedor?');
@@ -260,8 +273,6 @@ export default function DebtorPage() {
       } catch (e) {
         console.warn('[logs] falha ao registrar, mas devedor foi deletado.', e);
       }
-
-      // onSnapshot já detecta e redireciona
     } catch (err: any) {
       console.error('[softDeleteDebtor] error =>', err);
       const msg = err instanceof FirebaseError ? `${(err as FirebaseError).code}` : 'erro inesperado';
@@ -280,7 +291,6 @@ export default function DebtorPage() {
             <div className="card"><div className="card-body">Carregando...</div></div>
           ) : (
             <div className="space-y-6">
-              {/* Cabeçalho */}
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-normal pb-0.5">
@@ -294,14 +304,12 @@ export default function DebtorPage() {
                     Total original: <b>R$ {formatMoneyBR(Number(debtor.total))}</b>
                   </p>
                 </div>
-
                 <div className="shrink-0 flex items-center gap-2">
                   <a href="/#/" className="btn-soft">Voltar</a>
                   <button onClick={softDeleteDebtor} className="btn-danger">Excluir devedor</button>
                 </div>
               </div>
 
-              {/* Saldo atual */}
               <div className="card">
                 <div className="card-body flex items-center justify-between">
                   <div>
@@ -311,38 +319,31 @@ export default function DebtorPage() {
                 </div>
               </div>
 
-              {/* Novo pagamento */}
               <form onSubmit={addPayment} className="card">
-                <div className="card-body grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
-                  <input
-                    className="input"
-                    type="text"
-                    inputMode="decimal"
-                    placeholder="Valor pago (ex.: 100,50)"
-                    value={amount}
-                    onChange={(e)=>setAmount(e.target.value)}
-                    required
-                  />
-                  <input
-                    className="input"
-                    type="datetime-local"
-                    value={date}
-                    onChange={(e)=>setDate(e.target.value)}
-                    required
-                  />
-                  <input
-                    className="input"
-                    placeholder="Observação (opcional)"
-                    value={note}
-                    onChange={(e)=>setNote(e.target.value)}
-                  />
-                  <button type="submit" className="btn-primary" disabled={saving}>
-                    {saving ? 'Adicionando...' : 'Adicionar'}
+                <div className="card-body grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input className="input" type="text" inputMode="decimal" placeholder="Valor pago (ex.: 100,50)" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+                  <input className="input" type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} required />
+                  
+                  <select className="input" value={method} onChange={(e) => setMethod(e.target.value as Payment['paymentMethod'])} required>
+                    <option value="pix">PIX</option>
+                    <option value="credito">Cartão de Crédito</option>
+                    <option value="debito">Cartão de Débito</option>
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="outros">Outros</option>
+                  </select>
+                  
+                  {method === 'outros' && (
+                    <input className="input" placeholder="Especifique o método" value={otherMethod} onChange={(e) => setOtherMethod(e.target.value)} required />
+                  )}
+
+                  <input className="input md:col-span-2" placeholder="Observação (opcional)" value={note} onChange={(e) => setNote(e.target.value)} />
+                  
+                  <button type="submit" className="btn-primary md:col-span-2" disabled={saving}>
+                    {saving ? 'Adicionando...' : 'Adicionar Pagamento'}
                   </button>
                 </div>
               </form>
 
-              {/* Filtros + Histórico */}
               <div className="card">
                 <div className="card-body">
                   <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between mb-3">
@@ -351,7 +352,7 @@ export default function DebtorPage() {
                       <select
                         className="input !py-2 !px-3 !h-9"
                         value={sort}
-                        onChange={(e)=>setSort(e.target.value as 'asc'|'desc')}
+                        onChange={(e) => setSort(e.target.value as 'asc' | 'desc')}
                       >
                         <option value="desc">Mais recentes</option>
                         <option value="asc">Mais antigos</option>
@@ -361,30 +362,36 @@ export default function DebtorPage() {
                       className="input md:max-w-xs"
                       placeholder="Pesquisar observação"
                       value={q}
-                      onChange={(e)=>setQ(e.target.value)}
+                      onChange={(e) => setQ(e.target.value)}
                     />
                   </div>
 
-                  <ul className="space-y-2">
+                  <ul className="space-y-3">
                     {filteredPayments.map((p) => (
-                      <li key={p.id} className="flex items-center justify-between border-b border-slate-200 pb-2">
+                      <li key={p.id} className="flex items-start justify-between border-b border-slate-200 pb-3">
                         <div>
-                          <div className="font-semibold">R$ {formatMoneyBR(Number(p.amount))}</div>
-                          <div className="text-sm text-slate-600">
-                            {new Date(dateMs(p)).toLocaleString('pt-BR')}
-                          </div>
-                          {p.note && <div className="text-sm text-slate-700">{p.note}</div>}
+                          <div className="font-semibold text-lg">R$ {formatMoneyBR(Number(p.amount))}</div>
+                          <div className="text-sm text-slate-600">{new Date(dateMs(p)).toLocaleString('pt-BR')}</div>
+                          
+                          {p.paymentMethod && (
+                            <div className="mt-1 text-xs inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 border border-emerald-200">
+                              {paymentMethodLabels[p.paymentMethod] || p.paymentMethod}
+                              {p.paymentMethod === 'outros' && p.paymentMethodOther && `: ${p.paymentMethodOther}`}
+                            </div>
+                          )}
+
+                          {p.note && <div className="text-sm text-slate-700 mt-1 italic">"{p.note}"</div>}
                         </div>
                         <button
                           type="button"
-                          className="text-red-600 hover:text-red-700 underline"
+                          className="text-red-600 hover:text-red-700 underline shrink-0 ml-4"
                           onClick={() => deletePayment(p)}
                         >
                           Excluir
                         </button>
                       </li>
                     ))}
-                    {filteredPayments.length===0 && <li className="text-sm text-slate-500">Sem pagamentos ainda.</li>}
+                    {filteredPayments.length === 0 && <li className="text-sm text-slate-500">Sem pagamentos ainda.</li>}
                   </ul>
                 </div>
               </div>
@@ -393,15 +400,13 @@ export default function DebtorPage() {
         </main>
 
         <Footer />
+        <Toast
+          show={toastOn}
+          msg={toastMsg}
+          color={toastOk ? 'emerald' : 'red'}
+          onClose={() => setToastOn(false)}
+        />
       </div>
-
-      {/* Toast */}
-      <Toast
-        show={toastOn}
-        msg={toastMsg}
-        color={toastOk ? 'emerald' : 'red'}
-        onClose={() => setToastOn(false)}
-      />
     </AuthGuard>
   );
 }

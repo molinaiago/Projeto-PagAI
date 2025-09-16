@@ -8,7 +8,6 @@ export type Debtor = {
   deletedAt?: number;
   deletedBy?: string;
 
-  // NEW
   archived?: boolean;
   archivedAt?: number;
 };
@@ -18,7 +17,7 @@ export type Payment = {
   debtorId: string;
   ownerUid: string;
   amount: number;     // em reais
-  date: number;       // epoch ms
+  date: number;   
   note?: string | null;
   createdAt: number;
 
@@ -26,4 +25,7 @@ export type Payment = {
   deleted?: boolean;
   deletedAt?: number;
   deletedBy?: string;
+
+  paymentMethod?: 'pix' | 'credito' | 'debito' | 'dinheiro' | 'outros';
+  paymentMethodOther?: string | null;
 };
