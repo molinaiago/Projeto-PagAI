@@ -27,9 +27,5 @@ dist-ssr/
 *.sw?
 
 # Versionar package.json e package-lock.json para controle de dependências
-package-lock.json
-package.json
-
-.env
-.env.local
-.env.*.locals
+# package-lock.json
+# package.json

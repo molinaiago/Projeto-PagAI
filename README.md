@@ -1,52 +1,98 @@
-# Projeto-PagAI
-Projeto pessoal construído para atender a demanda de um cliente advogado.
+PagAÍ – Controle Simples de Devedores
 
-💸 PagAÍ
+Demo: https://pagai-9el.pages.dev
 
-✨ O PagAÍ é uma plataforma criada para simplificar a gestão de dívidas, oferecendo uma solução rápida, prática e confiável para organizar cobranças e pagamentos no dia a dia.
+App web para gerenciamento de devedores: cadastre valores devidos, registre pagamentos (com data/hora e observação), acompanhe saldo restante, visualize métricas (total x mensal), histórico, calendário por ano/mês e arquivos (arquivados/quitados). Interface moderna, responsiva e leve.
 
-🚀 Sobre o projeto
+✨ Stack
 
-Pensado para quem precisa manter o controle financeiro sem complicação, o PagAÍ ajuda você a acompanhar devedores, organizar valores pendentes e tomar decisões com mais clareza.
+Frontend: React + Vite + TypeScript
 
-💡 Ideal para:
+Estilização: Tailwind CSS
 
-🧑‍💼 Profissionais autônomos
-🏪 Pequenos comerciantes
-📋 Pessoas que querem organizar suas finanças
-💼 Planos disponíveis
+Backend/Autenticação: Firebase (Auth + Firestore)
 
-🟢 Plano Grátis
-Perfeito para começar:
+Deploy: Cloudflare Pages
 
-Até 3 devedores ativos simultaneamente
-Possibilidade de substituir devedores conforme necessário
+✅ Funcionalidades
+Autenticação & Perfil
 
-🔴 Plano PRO
-Para quem quer controle total:
+Cadastro e login por e-mail/senha
 
-🚀 Devedores ilimitados
-📊 Acesso à página de Métricas avançadas
-📈 Gráficos e relatórios detalhados para análise financeira
-⚙️ Funcionalidades
+Reset de senha via e-mail (modal integrado ao login)
 
-💸 Controle de devedores e valores pendentes
-📊 Visualização de métricas e desempenho (Plano PRO)
-🔄 Gestão flexível de registros
-📱 Interface simples, rápida e intuitiva
+Confirmação de e-mail e reenvio de verificação
 
-🛠️ Tecnologias utilizadas
-⚛️ React + Vite
-🎨 Tailwind CSS
-🔀 React Router
-🔥 Firebase (Auth & Firestore)
-✨ Compromisso com a Qualidade
+Perfil de usuário com atualização de senha
 
-O PagAÍ está em constante evolução, com melhorias contínuas para oferecer uma experiência cada vez mais completa, moderna e eficiente.
+Gestão de Devedores
 
-📬 Contato
+CRUD completo de devedores (soft delete e arquivamento automático quando quitado)
 
-Desenvolvido com dedicação ❤️
+Registro de pagamentos (soft delete disponível)
 
-🔗 Conecte-se comigo no LinkedIn:
-👉 linkedin.com/in/molinaiago
+Home/Dashboard com progresso pago x restante
+
+Visualização de métricas Total e Mensal, com alternância na interface
+
+Calendário e Arquivados
+
+Navegação por calendário: Ano → Mês → Devedores do período
+
+Arquivados: devedores quitados, com opção de reabrir ou excluir
+
+Pagamentos via PIX
+
+Geração de QR Code PIX com polling interno para atualizar o plano automaticamente
+
+Integração com Mercado Pago para assinatura PRO
+
+Exportação e UI
+
+Exportar CSV apenas com os itens visíveis
+
+Interface responsiva (mobile/desktop)
+
+Toastrs e mensagens consistentes para feedback do usuário
+
+Formatação monetária BR (1.234,56)
+
+📦 Estrutura resumida (src/)
+
+Components:
+AuthGuard.tsx, BackgroundFX.tsx, Footer.tsx, Navbar.tsx, UserMenu.tsx, ConfirmModal.tsx
+
+Libs:
+firebase.ts, money.ts (parseAmountBR / formatMoneyBR), auth.ts
+
+Pages:
+Home.tsx, Dashboard.tsx, Debtor.tsx, Metrics.tsx, Profile.tsx, Login.tsx, Register.tsx, ForgotMyPass.tsx
+Archived.tsx
+
+Calendário:
+calendar/CalendarYears.tsx, CalendarMonths.tsx, CalendarMonthDebtors.tsx
+
+Outros:
+types.ts, main.tsx, App.tsx, index.html, tailwind.config.js, postcss.config.js
+
+🧭 Rotas principais
+Rota	Descrição
+/login	Tela de login + reset de senha
+/register	Cadastro de usuário
+/	Home / Dashboard
+/debt/:id	Página detalhada do devedor
+/metrics	Métricas Total/Mensal, por devedor e geral
+/calendar → /calendar/:year → /calendar/:year/:month	Navegação por calendário
+/archived	Devedores quitados/arquivados
+/profile	Perfil do usuário
+💡 Convenções de UX
+
+Dinheiro: formatMoneyBR (lib money.ts)
+
+Entrada de valores: aceita 1.000,50 ou 1000.50 (lib parseAmountBR)
+
+Ordenação de pagamentos: mais recentes primeiro
+
+Exclusão: soft delete (pagamentos e devedor)
+
+Arquivamento automático: quando o restante chega a 0 (<= 0,01)
