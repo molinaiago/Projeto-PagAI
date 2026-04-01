@@ -1,49 +1,52 @@
 # Projeto-PagAI
 Projeto pessoal construído para atender a demanda de um cliente advogado.
 
-🚀 CODE.STUDEO
+💸 PagAÍ
 
-✨ Uma plataforma educacional desenvolvida como projeto de TCC com o objetivo de descomplicar a lógica de programação e o pensamento computacional de forma simples, prática e acessível — tudo em português.
+✨ O PagAÍ é uma plataforma criada para simplificar a gestão de dívidas, oferecendo uma solução rápida, prática e confiável para organizar cobranças e pagamentos no dia a dia.
 
-🎯 Sobre o projeto
+🚀 Sobre o projeto
 
-O CODE.STUDEO foi criado para ajudar alunos a aprender programação desde o zero até conceitos mais avançados, utilizando uma abordagem progressiva com trilhas de aprendizado e muita prática.
+Pensado para quem precisa manter o controle financeiro sem complicação, o PagAÍ ajuda você a acompanhar devedores, organizar valores pendentes e tomar decisões com mais clareza.
 
-💡 Aqui, o aprendizado acontece de forma:
+💡 Ideal para:
 
-Simples
-Interativa
-Guiada
-Baseada em exemplos do cotidiano
-📚 Trilhas de Aprendizado
+🧑‍💼 Profissionais autônomos
+🏪 Pequenos comerciantes
+📋 Pessoas que querem organizar suas finanças
+💼 Planos disponíveis
 
-O conteúdo é dividido em três níveis:
+🟢 Plano Grátis
+Perfeito para começar:
 
-🟢 Básico — Fundamentos de algoritmos, lógica booleana, decisões e repetições
-🟡 Intermediário — Vetores, matrizes, funções e laços condicionais
-🔴 Avançado — Complexidade, algoritmos de busca/ordenação e estruturas mais robustas
+Até 3 devedores ativos simultaneamente
+Possibilidade de substituir devedores conforme necessário
 
+🔴 Plano PRO
+Para quem quer controle total:
+
+🚀 Devedores ilimitados
+📊 Acesso à página de Métricas avançadas
+📈 Gráficos e relatórios detalhados para análise financeira
 ⚙️ Funcionalidades
 
-✨ Exercícios interativos com correção automática
-📊 Feedback instantâneo para reforçar o aprendizado
-📈 Painel de progresso individual
-👨‍🏫 Área para professores com gerenciamento de turmas (em desenvolvimento)
-🧩 Projetos práticos ao final de cada trilha
-
-🧑‍💻 Para quem é?
-
-🎓 Alunos
-Aprenda programação no seu ritmo, com uma base sólida e prática desde o início.
-
-👨‍🏫 Professores
-Acompanhe o desempenho dos alunos, identifique dificuldades e potencialize suas aulas.
+💸 Controle de devedores e valores pendentes
+📊 Visualização de métricas e desempenho (Plano PRO)
+🔄 Gestão flexível de registros
+📱 Interface simples, rápida e intuitiva
 
 🛠️ Tecnologias utilizadas
 ⚛️ React + Vite
 🎨 Tailwind CSS
 🔀 React Router
 🔥 Firebase (Auth & Firestore)
-🌟 Objetivo
+✨ Compromisso com a Qualidade
 
-Tornar o ensino de lógica de programação mais acessível, intuitivo e eficiente, ajudando novos desenvolvedores a darem seus primeiros passos com confiança.
+O PagAÍ está em constante evolução, com melhorias contínuas para oferecer uma experiência cada vez mais completa, moderna e eficiente.
+
+📬 Contato
+
+Desenvolvido com dedicação ❤️
+
+🔗 Conecte-se comigo no LinkedIn:
+👉 linkedin.com/in/molinaiago
